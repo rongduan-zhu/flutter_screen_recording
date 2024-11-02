@@ -109,6 +109,16 @@ class FlutterScreenRecordingPlugin() : MethodCallHandler, PluginRegistry.Activit
                     result.success(false)
                 }
             }
+            "pauseRecordScreen" -> {
+                println("pauseRecordScreen")
+                mMediaRecorder?.pause()
+                result.success(true)
+            }
+            "resumeRecordScreen" -> {
+                println("resumeRecordScreen")
+                mMediaRecorder?.resume()
+                result.success(true)
+            }
             "stopRecordScreen" -> {
                 try {
                     ForegroundService.stopService(appContext)
@@ -178,6 +188,8 @@ class FlutterScreenRecordingPlugin() : MethodCallHandler, PluginRegistry.Activit
                 mMediaRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC);
                 mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
                 mMediaRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                mMediaRecorder?.setAudioEncodingBitRate(128000)
+                mMediaRecorder?.setAudioSamplingRate(44100)
             } else {
                 mMediaRecorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             }
@@ -186,6 +198,14 @@ class FlutterScreenRecordingPlugin() : MethodCallHandler, PluginRegistry.Activit
             mMediaRecorder?.setVideoEncoder(MediaRecorder.VideoEncoder.H264)
             mMediaRecorder?.setVideoEncodingBitRate(5 * mDisplayWidth * mDisplayHeight)
             mMediaRecorder?.setVideoFrameRate(30)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && recordAudio!!) {
+                val intent = Intent(pluginBinding!!.applicationContext, ForegroundService::class.java)
+                intent.putExtra("title", "Recording")
+                intent.putExtra("message", "Recording screen and audio")
+                intent.putExtra("requireMic", true)
+                pluginBinding!!.applicationContext.startForegroundService(intent)
+            }
 
             mMediaRecorder?.prepare()
             mMediaRecorder?.start()

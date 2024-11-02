@@ -7,7 +7,7 @@
 
         <service
             android:name="com.foregroundservice.ForegroundService"
-            android:foregroundServiceType="mediaProjection">
+            android:foregroundServiceType="mediaProjection|microphone">
 
         </service>
 

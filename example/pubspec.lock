@@ -92,23 +92,14 @@ packages:
       path: "../flutter_screen_recording"
       relative: true
     source: path
-    version: "2.0.17"
+    version: "2.0.18"
   flutter_screen_recording_platform_interface:
     dependency: transitive
     description:
-      name: flutter_screen_recording_platform_interface
-      sha256: "9e07f78a2529bc5b6c77d045b392ed4062445543613fcad431c4cc1da57558d7"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../flutter_screen_recording_platform_interface"
+      relative: true
+    source: path
     version: "1.0.3"
-  flutter_screen_recording_web:
-    dependency: transitive
-    description:
-      name: flutter_screen_recording_web
-      sha256: bb19b3875e0d8ddfe009ed42086339f8016df05e685c37ff06cb56e165f2f7fa
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.8"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -119,14 +110,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  js:
-    dependency: transitive
+  image_gallery_saver:
+    dependency: "direct main"
     description:
-      name: js
-      sha256: c1b2e9b5ea78c45e1a0788d29606ba27dc5f71f019f32ca5140f61ef071838cf
+      name: image_gallery_saver
+      sha256: "0aba74216a4d9b0561510cb968015d56b701ba1bd94aace26aacdd8ae5761816"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.1"
+    version: "2.0.3"
   leak_tracker:
     dependency: transitive
     description:

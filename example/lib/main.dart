@@ -1,13 +1,17 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screen_recording/flutter_screen_recording.dart';
-import 'package:quiver/async.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:quiver/async.dart';
 
 void main() => runApp(MyApp());
+
+enum RecordingState {
+  initial,
+  recording,
+  paused,
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -15,8 +19,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool recording = false;
   int _time = 0;
+  RecordingState _recordingState = RecordingState.initial;
 
   requestPermissions() async {
     if (!kIsWeb) {
@@ -67,27 +71,41 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text('Time: $_time\n'),
-            !recording
-                ? Center(
-                    child: ElevatedButton(
-                      child: Text("Record Screen"),
-                      onPressed: () => startScreenRecord(false),
-                    ),
-                  )
-                : Container(),
-            !recording
-                ? Center(
-                    child: ElevatedButton(
-                      child: Text("Record Screen & audio"),
-                      onPressed: () => startScreenRecord(true),
-                    ),
-                  )
-                : Center(
-                    child: ElevatedButton(
-                      child: Text("Stop Record"),
-                      onPressed: () => stopScreenRecord(),
-                    ),
-                  )
+            if (_recordingState == RecordingState.initial)
+              Center(
+                child: ElevatedButton(
+                  child: Text("Record Screen"),
+                  onPressed: () => startScreenRecord(false),
+                ),
+              ),
+            if (_recordingState == RecordingState.initial)
+              Center(
+                child: ElevatedButton(
+                  child: Text("Record Screen & audio"),
+                  onPressed: () => startScreenRecord(true),
+                ),
+              ),
+            if (_recordingState == RecordingState.recording)
+              Center(
+                child: ElevatedButton(
+                  child: Text("Pause Record"),
+                  onPressed: () => pauseScreenRecord(),
+                ),
+              ),
+            if (_recordingState == RecordingState.recording)
+              Center(
+                child: ElevatedButton(
+                  child: Text("Stop Record"),
+                  onPressed: () => stopScreenRecord(),
+                ),
+              ),
+            if (_recordingState == RecordingState.paused)
+              Center(
+                child: ElevatedButton(
+                  child: Text("Resume Record"),
+                  onPressed: () => resumeScreenRecord(),
+                ),
+              ),
           ],
         ),
       ),
@@ -112,7 +130,7 @@ class _MyAppState extends State<MyApp> {
     }
 
     if (start) {
-      setState(() => recording = !recording);
+      setState(() => _recordingState = RecordingState.recording);
     }
 
     return start;
@@ -121,10 +139,20 @@ class _MyAppState extends State<MyApp> {
   stopScreenRecord() async {
     String path = await FlutterScreenRecording.stopRecordScreen;
     setState(() {
-      recording = !recording;
+      _recordingState = RecordingState.initial;
     });
     print("Opening video");
     print(path);
     OpenFile.open(path);
+  }
+
+  pauseScreenRecord() async {
+    await FlutterScreenRecording.pauseRecordScreen();
+    setState(() => _recordingState = RecordingState.paused);
+  }
+
+  resumeScreenRecord() async {
+    await FlutterScreenRecording.resumeRecordScreen();
+    setState(() => _recordingState = RecordingState.recording);
   }
 }

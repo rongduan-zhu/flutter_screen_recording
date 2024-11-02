@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import com.isvisoft.flutter_screen_recording.FlutterScreenRecordingPlugin
 import com.isvisoft.flutter_screen_recording.R
 import android.app.Activity
+import android.content.pm.ServiceInfo
 
 class ForegroundService : Service() {
     private val CHANNEL_ID = "ForegroundService Kotlin"
@@ -88,7 +89,7 @@ class ForegroundService : Service() {
         val notificationIntent = Intent(this, FlutterScreenRecordingPlugin::class.java)
 
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, notificationIntent, PendingIntent.FLAG_MUTABLE
+            this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -98,7 +99,7 @@ class ForegroundService : Service() {
             .setContentIntent(pendingIntent)
             .build()
 
-        startForeground(1, notification)
+        startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION or ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
         println("-------------------------- startForegroundServiceWithNotification")
     }
 

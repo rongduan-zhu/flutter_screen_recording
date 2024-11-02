@@ -37,6 +37,16 @@ class MethodChannelFlutterScreenRecording
     return start;
   }
 
+  Future<bool> pauseRecordScreen() async {
+    final bool pause = await _channel.invokeMethod('pauseRecordScreen');
+    return pause;
+  }
+
+  Future<bool> resumeRecordScreen() async {
+    final bool resume = await _channel.invokeMethod('resumeRecordScreen');
+    return resume;
+  }
+
   Future<String> get stopRecordScreen async {
     final String path = await _channel.invokeMethod('stopRecordScreen');
     return path;

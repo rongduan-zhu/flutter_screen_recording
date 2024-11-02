@@ -4,7 +4,7 @@ import ReplayKit
 import Photos
 
 public class SwiftFlutterScreenRecordingPlugin: NSObject, FlutterPlugin {
-    
+
 let recorder = RPScreenRecorder.shared()
 
 var videoOutputURL : URL?
@@ -16,7 +16,7 @@ var nameVideo: String = ""
 var recordAudio: Bool = false;
 var myResult: FlutterResult?
 let screenSize = UIScreen.main.bounds
-    
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter_screen_recording", binaryMessenger: registrar.messenger())
     let instance = SwiftFlutterScreenRecordingPlugin()
@@ -33,7 +33,11 @@ let screenSize = UIScreen.main.bounds
          self.nameVideo = (args?["name"] as? String)!+".mp4"
          startRecording()
 
-    }else if(call.method == "stopRecordScreen"){
+    } else if(call.method == "pauseRecordScreen"){
+        pauseRecording()
+    } else if (call.method == "resumeRecordScreen"){
+        resumeRecording()
+    } else if(call.method == "stopRecordScreen"){
         if(videoWriter != nil){
             stopRecording()
             let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString
@@ -66,49 +70,49 @@ let screenSize = UIScreen.main.bounds
 
         //Create the video settings
         if #available(iOS 11.0, *) {
-            
+
             var codec = AVVideoCodecJPEG;
-            
+
             if(recordAudio){
                 codec = AVVideoCodecH264;
             }
-            
+
             let videoSettings: [String : Any] = [
                 AVVideoCodecKey  : codec,
                 AVVideoWidthKey  : screenSize.width,
                 AVVideoHeightKey : screenSize.height
             ]
-                        
+
             if(recordAudio){
-                
+
                 let audioOutputSettings: [String : Any] = [
                     AVNumberOfChannelsKey : 2,
                     AVFormatIDKey : kAudioFormatMPEG4AAC,
                     AVSampleRateKey: 44100,
                 ]
-                
+
                 audioInput = AVAssetWriterInput(mediaType: AVMediaType.audio, outputSettings: audioOutputSettings)
                 videoWriter?.add(audioInput)
-            
+
             }
 
 
         //Create the asset writer input object whihc is actually used to write out the video
          videoWriterInput = AVAssetWriterInput(mediaType: AVMediaType.video, outputSettings: videoSettings);
          videoWriter?.add(videoWriterInput!);
-            
+
         }
 
         //Tell the screen recorder to start capturing and to call the handler
         if #available(iOS 11.0, *) {
-            
+
             if(recordAudio){
                 RPScreenRecorder.shared().isMicrophoneEnabled=true;
             }else{
                 RPScreenRecorder.shared().isMicrophoneEnabled=false;
 
             }
-            
+
             RPScreenRecorder.shared().startCapture(
             handler: { (cmSampleBuffer, rpSampleType, error) in
                 guard error == nil else {
@@ -158,6 +162,14 @@ let screenSize = UIScreen.main.bounds
         }
     }
 
+    @objc func pauseRecording() {
+        RPScreenRecorder.shared().pauseCapture()
+    }
+
+    @objc func resumeRecording() {
+        RPScreenRecorder.shared().resumeCapture()
+    }
+
     @objc func stopRecording() {
         //Stop Recording the screen
         if #available(iOS 11.0, *) {
@@ -170,7 +182,7 @@ let screenSize = UIScreen.main.bounds
 
         self.videoWriterInput?.markAsFinished();
         self.audioInput?.markAsFinished();
-        
+
         self.videoWriter?.finishWriting {
             print("finished writing video");
 
@@ -190,7 +202,7 @@ let screenSize = UIScreen.main.bounds
                 }
             }
         }
-    
+
 }
-    
+
 }
