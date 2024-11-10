@@ -177,8 +177,7 @@ class FlutterScreenRecordingPlugin() : MethodCallHandler, PluginRegistry.Activit
     fun startRecordScreen() {
         try {
             try {
-                mFileName = pluginBinding!!.applicationContext.externalCacheDir?.absolutePath
-                mFileName += "/$videoName.mp4"
+                mFileName = videoName
             } catch (e: IOException) {
                 println("Error creating name")
                 return
